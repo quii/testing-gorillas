@@ -31,9 +31,7 @@ func TestMyHandler(t *testing.T) {
 }
 ````
 
-The solution is very easy once you read the documentation for [`httptest.NewServer`](https://golang.org/pkg/net/http/httptest/#NewServer), which says it requires a `http.Handler`. The `mux.NewRouter` returns a `http.Handler` so you can just pass your *router with it's handlers wired up* and then you can test it as if it's a fully running web server.
-
-So create a function which encapsulates both your routing and the handlers that run against them.
+The solution is very easy once you realise that `mux.NewRouter` just returns a http.Handler, which you can then "call" like a normal function; no magic required! (credit to [MistakenForYeti](https://www.reddit.com/user/MistakenForYeti) for pointing this out). So just create a function which creates your router and wires up your handlers.
 
 ````go
 func newHelloServer() http.Handler {
@@ -43,31 +41,7 @@ func newHelloServer() http.Handler {
 }
 ````
 
-Now in your test you can call your function and pass it to `httptest.NewServer`
-
-````go
-func TestMyRouterAndHandler(t *testing.T) {
-	svr := httptest.NewServer(newHelloServer())
-	defer svr.Close()
-
-	res, err := http.Get(svr.URL + "/hello/chris")
-
-	if err != nil {
-		t.Fatal("Problem calling hello server", err)
-	}
-
-	greeting, err := ioutil.ReadAll(res.Body)
-	res.Body.Close()
-
-	if string(greeting) != "Hello, chris" {
-		t.Error("Expected hello Chris but got ", greeting)
-	}
-}
-````
-
-## edit! 
-
-Thanks to [MistakenForYeti](https://www.reddit.com/user/MistakenForYeti) for pointing that even easier still you can just call ServerHTTP on your server. That is not only simpler, but *feels* a bit easier to understand; afterall a HTTP server is just a function which takes a request and writes a response. 
+Now in your test you can call your complete server and make assertions.
 
 ````go
 func TestMyRouterAndHandler(t *testing.T) {
@@ -81,7 +55,7 @@ func TestMyRouterAndHandler(t *testing.T) {
 }
 ````
 
-Granted, this is not *unit* testing the handler's behaviours in isolation but there is an inherent coupling (with Gorilla at least), between the routing and the handling; so you may as well just accept it and test like I do in the example.
+Granted, this is not *unit* testing the **handler's** behaviours in isolation but there is an inherent coupling (with Gorilla at least), between the routing and the handling; so you may as well just accept it and test like I do in the example.
 
 In practice, a handler should delegate it's domain logic to another service anyway (which you could then mock and inject here) so testing "handling" and "routing" together seems like a fair enough trade-off.
 
