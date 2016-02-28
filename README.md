@@ -5,7 +5,7 @@ In this example I will illustrate the ease of testing a web server which happens
 I have seen a number of tutorials on the web that seem to overcomplicate this task, even introducing special testing libraries to get around the fact that Gorilla introduces something which is a little tough to unit-test.
 ````go
 func helloHandler(w http.ResponseWriter, r *http.Request) {
-	name, exists := mux.Vars(r)["name"] 
+	name, exists := mux.Vars(r)["name"]
 
 	if !exists {
 		name = "world"
@@ -50,17 +50,18 @@ func TestMyRouterAndHandler(t *testing.T) {
 	svr := httptest.NewServer(newHelloServer())
 	defer svr.Close()
 
-	res, err := http.Get(svr.URL + "/hello/world")
+	res, err := http.Get(svr.URL + "/hello/chris")
 
 	if err != nil {
 		t.Fatal("Problem calling hello server", err)
 	}
 
-	if res.StatusCode != http.StatusOK {
-		t.Error("Expected a 200 but got", res.StatusCode)
-	}
+	greeting, err := ioutil.ReadAll(res.Body)
+	res.Body.Close()
 
-	// etc...
+	if string(greeting) != "Hello, chris" {
+		t.Error("Expected hello Chris but got ", greeting)
+	}
 }
 ````
 
