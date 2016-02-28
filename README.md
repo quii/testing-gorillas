@@ -31,7 +31,9 @@ func TestMyHandler(t *testing.T) {
 }
 ````
 
-The solution is very easy once you realise that `mux.NewRouter` just returns a http.Handler, which you can then "call" like a normal function; no magic required! (credit to [MistakenForYeti](https://www.reddit.com/user/MistakenForYeti) for pointing this out). So just create a function which creates your router and wires up your handlers.
+The solution is very easy once you realise that `mux.NewRouter` just returns a http.Handler, which you can then call with a `http.Request` and a `httptest.ResponseRecorder` (credit to [MistakenForYeti](https://www.reddit.com/user/MistakenForYeti) for pointing this out).
+
+So just create a function which creates your router and wires up your handlers:
 
 ````go
 func newHelloServer() http.Handler {
