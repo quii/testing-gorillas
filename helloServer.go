@@ -13,6 +13,11 @@ func newHelloServer() http.Handler {
 }
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
-	name := mux.Vars(r)["name"]
+	name, exists := mux.Vars(r)["name"]
+
+	if !exists {
+		name = "world"
+	}
+
 	w.Write([]byte("Hello, " + name))
 }
