@@ -65,6 +65,22 @@ func TestMyRouterAndHandler(t *testing.T) {
 }
 ````
 
+## edit! 
+
+Thanks to [MistakenForYeti](https://www.reddit.com/user/MistakenForYeti) for pointing that even easier still you can just call ServerHTTP on your server. That is not only simpler, but *feels* a bit easier to understand; afterall a HTTP server is just a function which takes a request and writes a response. 
+
+````go
+func TestMyRouterAndHandler(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/hello/chris", nil)
+	res := httptest.NewRecorder()
+	newHelloServer().ServeHTTP(res, req)
+
+	if res.Body.String() != "Hello, chris" {
+		t.Error("Expected hello Chris but got ", res.Body.String())
+	}
+}
+````
+
 Granted, this is not *unit* testing the handler's behaviours in isolation but there is an inherent coupling (with Gorilla at least), between the routing and the handling; so you may as well just accept it and test like I do in the example.
 
 In practice, a handler should delegate it's domain logic to another service anyway (which you could then mock and inject here) so testing "handling" and "routing" together seems like a fair enough trade-off.
