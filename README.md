@@ -31,7 +31,7 @@ func TestMyHandler(t *testing.T) {
 }
 ````
 
-The solution is very easy once you read the documentation for [`httptest.NewServer`](https://golang.org/pkg/net/http/httptest/#NewServer), which says it requires a `http.Handler`. The `mux.NewRouter` returns a `http.Handler` so you can just pass your *router with it's handlers wired up* rather than your handlers and then you can test it as if it's a fully running web server.
+The solution is very easy once you read the documentation for [`httptest.NewServer`](https://golang.org/pkg/net/http/httptest/#NewServer), which says it requires a `http.Handler`. The `mux.NewRouter` returns a `http.Handler` so you can just pass your *router with it's handlers wired up* and then you can test it as if it's a fully running web server.
 
 So create a function which encapsulates both your routing and the handlers that run against them.
 
